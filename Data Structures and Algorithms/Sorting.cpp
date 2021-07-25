@@ -203,6 +203,63 @@ void radix_sort(int a[], int n) {
     cout << endl;
 }
 
+void shell_sort(int a[], int n) {
+    int arr[n];
+    copy(a, a+n, arr);
+
+    for (int h = n/2; h > 0; h /= 2) {
+        for (int i = h; i < n; i++) {
+            int temp = arr[i];
+            int j = i;
+            while (j >= h && arr[j - h] > temp) {
+                arr[j] = arr[j - h];
+                j -= h;
+            }
+            arr[j] = temp;
+        }
+    }
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
+void tim_sort(int a[], int n) {
+    int arr[n];
+    copy(a, a+n, arr);
+    int RUN = 4;
+
+    for (int i = 0; i < n; i += RUN) {
+        int left = i, right = min(i + RUN, n);
+        for (int i = left + 1; i < right; i++) {
+            for (int j = i; j > left; j--) {
+                if (arr[j] < arr[j-1]) {
+                    int temp = arr[j-1];
+                    arr[j-1] = arr[j];
+                    arr[j] = temp;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    for (int size = RUN; size < n; size *= 2) {
+        for (int left = 0; left < n; left += 2*size) {
+            int mid = left + size - 1;
+            int right = min(left + 2*size - 1, n - 1);
+            if (mid < right) {
+                merge(arr, left, mid, right);
+            }
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
 int main() {
     int arr[] = {4, 2, 10, 13, 6, 1, 16, 7, 17};
     int n = sizeof(arr) / sizeof(arr[0]);
@@ -215,6 +272,8 @@ int main() {
     heap_sort(arr, n);
     count_sort(arr, n);
     radix_sort(arr, n);
+    shell_sort(arr, n);
+    tim_sort(arr, n);
     
     return 0;
 }
