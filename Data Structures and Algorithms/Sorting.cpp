@@ -1,5 +1,7 @@
 #include <iostream>
 #include <algorithm>
+#include <vector>
+#include <list>
 #include <string.h>
 
 using namespace std;
@@ -260,20 +262,219 @@ void tim_sort(int a[], int n) {
     cout << endl;
 }
 
+void comb_sort(int a[], int n) {
+    int arr[n];
+    copy(a, a+n, arr);
+
+    int gap = n;
+    bool swapped = true;
+    while (gap != 1 || swapped) {
+        gap = (gap * 10) / 13;
+        if (gap < 1)
+            gap = 1;
+        
+        swapped = false;
+        for (int i = 0; i < n - gap; i++) {
+            if (arr[i] > arr[i + gap]) {
+                swapped = true;
+                int temp = arr[i];
+                arr[i] = arr[i + gap];
+                arr[i + gap] = temp;
+            }
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
+void pigeonhole_sort(int a[], int n) {
+    int arr[n];
+    copy(a, a+n, arr);
+
+    int min = INT32_MAX, max = INT32_MIN;
+    for (int i = 0; i < n; i++) {
+        if (arr[i] < min) 
+            min = arr[i];
+        if (arr[i] > max)
+            max = arr[i];
+    }
+    int range = max - min + 1;
+
+    vector<int> pigeonholes[range];
+    for (int i = 0; i < n; i++) {
+        pigeonholes[arr[i] - min].push_back(arr[i]);
+    }
+
+    int index = 0;
+    for (auto i : pigeonholes) {
+        for (auto j : i) {
+            arr[index++] = j;
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
+void cycle_sort(int a[], int n) {
+    int arr[n];
+    copy(a, a+n, arr);
+
+    for (int cycle = 0; cycle <= n - 2; cycle++) {
+        int item = arr[cycle];
+        int pos = cycle;
+        for (int i = cycle + 1; i < n; i++) {
+            if (arr[i] < item)
+                pos++;
+        }
+
+        if (pos == cycle)
+            continue;
+
+        while (item == arr[pos]) {
+            pos++;
+        }
+        if (pos != cycle) {
+            int temp = item;
+            item = arr[pos];
+            arr[pos] = temp;
+        }
+
+        while (pos != cycle) {
+            pos = cycle;
+            for (int i = cycle + 1; i < n; i++) {
+                if (arr[i] < item)
+                    pos += 1;
+            }
+
+            while (item == arr[pos]) {
+                pos++;
+            }
+            if (item != arr[pos]) {
+                int temp = item;
+                item = arr[pos];
+                arr[pos] = temp;
+            }
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
+void cocktail_sort(int a[], int n) {
+    int arr[n];
+    copy(a, a+n, arr);
+
+    bool swapped = true;
+    int start = 0, end = n - 1;
+
+    while (swapped) {
+        swapped = false;
+        for (int i = start; i < end; i++) {
+            if (arr[i] > arr[i + 1]) {
+                swapped = true;
+                int temp = arr[i];
+                arr[i] = arr[i + 1];
+                arr[i + 1] = temp;
+            }
+        }
+        end--;
+
+        swapped = false;
+        for (int i = end - 1; i >= start; i--) {
+            if (arr[i] > arr[i + 1]) {
+                swapped = true;
+                int temp = arr[i];
+                arr[i] = arr[i + 1];
+                arr[i + 1] = temp;
+            }
+        }
+        start++;
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
+void strand_sort(list<int> &ip, list<int> &op) {
+    if (ip.empty())
+        return;
+
+    list<int> sublist;
+    sublist.push_back(ip.front());
+    ip.pop_front();
+
+    for (auto i = ip.begin(); i != ip.end(); ) {
+        if (*i > sublist.back()) {
+            sublist.push_back(*i);
+            i = ip.erase(i);
+        } else {
+            i++;
+        }
+    }
+
+    op.merge(sublist);
+    strand_sort(ip, op);
+}
+void strand_util(int a[], int n) {
+    list<int> ip, op;
+     for (int i = 0; i < n; i++) {
+        ip.push_back(a[i]);
+    }
+
+    strand_sort(ip, op);
+
+    for(auto i : op) {
+        cout << i << " ";
+    }
+    cout << endl;
+} 
+
 int main() {
     int arr[] = {4, 2, 10, 13, 6, 1, 16, 7, 17};
     int n = sizeof(arr) / sizeof(arr[0]);
 
+    int no = 1;
+    cout << no++ << ": ";
     selection_sort(arr, n);
+    cout << no++ << ": ";
     bubble_sort(arr, n);
+    cout << no++ << ": ";
     insertion_sort(arr, n);
+    cout << no++ << ": ";
     merge_util(arr, n);
+    cout << no++ << ": ";
     quick_util(arr, n);
+    cout << no++ << ": ";
     heap_sort(arr, n);
+    cout << no++ << ": ";
     count_sort(arr, n);
+    cout << no++ << ": ";
     radix_sort(arr, n);
+    cout << no++ << ": ";
     shell_sort(arr, n);
+    cout << no++ << ": ";
     tim_sort(arr, n);
+    cout << no++ << ": ";
+    comb_sort(arr, n);
+    cout << no++ << ": ";
+    pigeonhole_sort(arr, n);
+    cout << no++ << ": ";
+    cycle_sort(arr, n);
+    cout << no++ << ": ";
+    cocktail_sort(arr, n);
+    cout << no++ << ": ";
+    strand_util(arr, n);
     
     return 0;
 }
